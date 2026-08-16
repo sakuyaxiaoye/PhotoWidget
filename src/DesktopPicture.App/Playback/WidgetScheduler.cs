@@ -76,11 +76,33 @@ public sealed class WidgetScheduler : IDisposable
         _scanCts = new CancellationTokenSource();
 
         var rootPath = _config.RootPath;
-        if (string.IsNullOrWhiteSpace(rootPath) || !Directory.Exists(rootPath))
+        if (string.IsNullOrWhiteSpace(rootPath))
         {
             Application.Current?.Dispatcher.Invoke(() =>
             {
                 _window.ShowPlaceholder("未配置有效图片文件夹", "请右键托盘图标或在设置中指定图片根目录");
+            });
+            return;
+        }
+
+        if (!Directory.Exists(rootPath))
+        {
+            // During boot, external / secondary drive might take a moment to mount. Run background retry.
+            _ = Task.Run(async () =>
+            {
+                for (int i = 0; i < 6; i++)
+                {
+                    await Task.Delay(1500);
+                    if (Directory.Exists(rootPath))
+                    {
+                        Application.Current?.Dispatcher.Invoke(() => RescanAndPlay());
+                        return;
+                    }
+                }
+                Application.Current?.Dispatcher.Invoke(() =>
+                {
+                    _window.ShowPlaceholder("未找到指定文件夹", $"无法访问目录: {rootPath}\n(请检查驱动器连接)");
+                });
             });
             return;
         }
@@ -103,8 +125,9 @@ public sealed class WidgetScheduler : IDisposable
             _window.UpdateCandidateCount(_rootContext.CurrentSnapshot.Count);
             if (!_rootContext.CurrentSnapshot.IsEmpty)
             {
-                // Hot startup: zero-wait instant display
+                // Hot startup: zero-wait instant display & immediately start rotation timer
                 SwitchNext();
+                ResetTimer();
             }
             else
             {
@@ -135,13 +158,12 @@ public sealed class WidgetScheduler : IDisposable
                     {
                         _window.ShowPlaceholder("文件夹内未找到支持的图片", "支持格式: JPG, JPEG, PNG, WebP, AVIF, HEIC, GIF 等");
                     }
-                    else
+                    else if (_lastShownPath == null)
                     {
                         SwitchNext();
+                        ResetTimer();
                     }
                 });
-
-                ResetTimer();
             }
             catch (OperationCanceledException) { }
             catch (Exception ex)
@@ -163,6 +185,7 @@ public sealed class WidgetScheduler : IDisposable
             else if (_lastShownPath == null)
             {
                 SwitchNext();
+                ResetTimer();
             }
         });
     }
@@ -347,6 +370,18 @@ public sealed class WidgetScheduler : IDisposable
         // Save warm startup preview
         StartupPreviewCache.Instance.SavePreview(_config.Id, result.Bitmap);
         SettingsService.Instance.ScheduleSave(250);
+
+        // Schedule pre-decode for the next cycle
+        if (!_config.Paused && !_isDisposed)
+        {
+            int intervalMs = Math.Clamp(_config.IntervalSeconds, 5, 86400) * 1000;
+            int predecodeDelay = Math.Max(1000, intervalMs - 2500);
+            _predecodeTimer?.Dispose();
+            _predecodeTimer = new Timer(_ =>
+            {
+                PredecodeNext();
+            }, null, predecodeDelay, Timeout.Infinite);
+        }
     }
 
     public void ResetTimer()

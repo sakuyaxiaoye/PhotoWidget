@@ -84,7 +84,7 @@ graph TD
 
 ### 1. 克隆仓库
 ```bash
-git clone https://github.com/your-username/PhotoWidget.git
+git clone https://github.com/sakuyaxiaoye/PhotoWidget.git
 cd PhotoWidget
 ```
 

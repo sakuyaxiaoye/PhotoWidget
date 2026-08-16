@@ -10,7 +10,7 @@
         Background="Transparent"
         ShowInTaskbar="False"
         Focusable="False"
-        ResizeMode="CanResizeWithGrip"
+        ResizeMode="CanResize"
         MinWidth="120"
         MinHeight="90"
         MaxWidth="3840"
@@ -52,17 +52,13 @@
         </Style>
     </Window.Resources>
 
-    <Grid Margin="6">
-        <!-- Main Window Container with 16px Rounded Corner -->
+    <Grid>
+        <!-- Main Window Container with Rounded Corner -->
         <Border x:Name="CardBorder"
-                CornerRadius="16"
+                CornerRadius="12"
                 Background="#0F172A"
                 BorderBrush="#25FFFFFF"
                 BorderThickness="1">
-            <Border.Effect>
-                <DropShadowEffect Color="#000000" BlurRadius="16" Opacity="0.45" ShadowDepth="4" Direction="270"/>
-            </Border.Effect>
-
             <Grid x:Name="ContentHost">
                 <!-- Dual Overlapping Image Layer for 350ms Hardware-Accelerated Cross-Fade -->
                 <Grid x:Name="ImageContainer" Visibility="Collapsed">

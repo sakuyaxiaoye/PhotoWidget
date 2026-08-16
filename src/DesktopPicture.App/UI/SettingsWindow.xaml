@@ -1,0 +1,306 @@
+<Window x:Class="DesktopPicture.UI.SettingsWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="照片组件设置 - PhotoWidget"
+        Width="580"
+        Height="700"
+        WindowStartupLocation="CenterScreen"
+        ResizeMode="NoResize"
+        Background="#0B0F19"
+        Foreground="#F8FAFC"
+        FontFamily="Segoe UI Variable Display, Segoe UI, Microsoft YaHei UI"
+        TextOptions.TextFormattingMode="Display">
+    <Window.Resources>
+        <!-- Modern Rounded Input Field Style -->
+        <Style TargetType="TextBox">
+            <Setter Property="Background" Value="#161F30"/>
+            <Setter Property="Foreground" Value="#F8FAFC"/>
+            <Setter Property="BorderBrush" Value="#2A374D"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Padding" Value="12,8"/>
+            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="TextBox">
+                        <Border x:Name="border"
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="8">
+                            <ScrollViewer x:Name="PART_ContentHost" Focusable="False" HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Hidden"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsFocused" Value="True">
+                                <Setter TargetName="border" Property="BorderBrush" Value="#3B82F6"/>
+                                <Setter TargetName="border" Property="Background" Value="#1A253A"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- Modern Chip / Pill Button Style -->
+        <Style x:Key="PresetChipStyle" TargetType="Button">
+            <Setter Property="Background" Value="#1E293B"/>
+            <Setter Property="Foreground" Value="#CBD5E1"/>
+            <Setter Property="BorderBrush" Value="#334155"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Padding" Value="10,5"/>
+            <Setter Property="FontSize" Value="11"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="chipBorder"
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="6"
+                                Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="chipBorder" Property="Background" Value="#2563EB"/>
+                                <Setter TargetName="chipBorder" Property="BorderBrush" Value="#60A5FA"/>
+                                <Setter Property="Foreground" Value="#FFFFFF"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="chipBorder" Property="Background" Value="#1D4ED8"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- Primary Action Button -->
+        <Style x:Key="PrimaryActionBtn" TargetType="Button">
+            <Setter Property="Background" Value="#2563EB"/>
+            <Setter Property="Foreground" Value="#FFFFFF"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Padding" Value="20,9"/>
+            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="btnBorder" Background="{TemplateBinding Background}" CornerRadius="8" Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="btnBorder" Property="Background" Value="#3B82F6"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="btnBorder" Property="Background" Value="#1D4ED8"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- Secondary Button -->
+        <Style x:Key="SecondaryActionBtn" TargetType="Button">
+            <Setter Property="Background" Value="#1E293B"/>
+            <Setter Property="Foreground" Value="#E2E8F0"/>
+            <Setter Property="BorderBrush" Value="#334155"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Padding" Value="16,8"/>
+            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="secBorder"
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="8"
+                                Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="secBorder" Property="Background" Value="#334155"/>
+                                <Setter TargetName="secBorder" Property="BorderBrush" Value="#475569"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- Modern CheckBox -->
+        <Style TargetType="CheckBox">
+            <Setter Property="Foreground" Value="#E2E8F0"/>
+            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="Cursor" Value="Hand"/>
+        </Style>
+    </Window.Resources>
+
+    <Grid Margin="20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- Header -->
+        <Border Grid.Row="0" Background="#111827" BorderBrush="#1F2937" BorderThickness="1" CornerRadius="12" Padding="16,14" Margin="0,0,0,14">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <StackPanel Grid.Column="0">
+                    <TextBlock x:Name="DialogHeaderTitle" Text="⚙️ 图片组件配置" FontSize="17" FontWeight="Bold" Foreground="#FFFFFF" Margin="0,0,0,3"/>
+                    <TextBlock Text="独立配置展示目录、横竖方向、外观圆角与轮播间隔" FontSize="12" Foreground="#94A3B8"/>
+                </StackPanel>
+                <Border Grid.Column="1" Background="#1E293B" BorderBrush="#334155" BorderThickness="1" CornerRadius="6" Padding="8,4" VerticalAlignment="Center">
+                    <TextBlock Text="300万图库极速引擎" FontSize="11" Foreground="#38BDF8" FontWeight="SemiBold"/>
+                </Border>
+            </Grid>
+        </Border>
+
+        <!-- Main Form Groups -->
+        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" Margin="0,0,0,10">
+            <StackPanel>
+                <!-- Group 1: Name & Source Folder -->
+                <Border Background="#111827" BorderBrush="#1F2937" BorderThickness="1" CornerRadius="12" Padding="16" Margin="0,0,0,12">
+                    <StackPanel>
+                        <TextBlock Text="📁 图库与目录" FontSize="13" FontWeight="Bold" Foreground="#F8FAFC" Margin="0,0,0,12"/>
+
+                        <!-- Widget Name -->
+                        <TextBlock Text="组件名称" Foreground="#94A3B8" FontSize="12" Margin="0,0,0,5"/>
+                        <TextBox x:Name="NameInput" Text="图片组件 1" Margin="0,0,0,12"/>
+
+                        <!-- Root Folder -->
+                        <TextBlock Text="图片根目录 (递归扫描所有普通子文件夹)" Foreground="#94A3B8" FontSize="12" Margin="0,0,0,5"/>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBox x:Name="RootPathInput" Margin="0,0,8,0" IsReadOnly="True"/>
+                            <Button Grid.Column="1" Content="📁 浏览文件夹..." Click="BrowseFolder_Click" Style="{StaticResource SecondaryActionBtn}" Padding="12,7"/>
+                        </Grid>
+                    </StackPanel>
+                </Border>
+
+                <!-- Group 2: Dimensions & Orientation -->
+                <Border Background="#111827" BorderBrush="#1F2937" BorderThickness="1" CornerRadius="12" Padding="16" Margin="0,0,0,12">
+                    <StackPanel>
+                        <TextBlock Text="📐 尺寸与方向 (支持 2K/4K 超清与自由缩放)" FontSize="13" FontWeight="Bold" Foreground="#F8FAFC" Margin="0,0,0,12"/>
+
+                        <!-- Dimensions Inputs -->
+                        <Grid Margin="0,0,0,12">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <StackPanel Grid.Column="0">
+                                <TextBlock Text="宽度 (DIP, 90 ~ 3840)" Foreground="#94A3B8" FontSize="12" Margin="0,0,0,5"/>
+                                <TextBox x:Name="WidthInput" Text="480"/>
+                            </StackPanel>
+                            <Button Grid.Column="1" Content="🔄 互换宽高" Style="{StaticResource SecondaryActionBtn}" Padding="10,6" Margin="10,20,10,0" VerticalAlignment="Center" Click="SwapOrientation_Click" ToolTip="一键互换宽高（横竖屏秒切）"/>
+                            <StackPanel Grid.Column="2">
+                                <TextBlock Text="高度 (DIP, 90 ~ 3840)" Foreground="#94A3B8" FontSize="12" Margin="0,0,0,5"/>
+                                <TextBox x:Name="HeightInput" Text="270"/>
+                            </StackPanel>
+                        </Grid>
+
+                        <!-- Landscape Presets -->
+                        <StackPanel Orientation="Horizontal" Margin="0,0,0,6">
+                            <TextBlock Text="横屏预设:" FontSize="11" Foreground="#64748B" VerticalAlignment="Center" Margin="0,0,8,0" Width="55"/>
+                            <Button Content="480×270" Style="{StaticResource PresetChipStyle}" Margin="0,0,5,0" Click="PresetSize_Click" Tag="480,270"/>
+                            <Button Content="640×360" Style="{StaticResource PresetChipStyle}" Margin="0,0,5,0" Click="PresetSize_Click" Tag="640,360"/>
+                            <Button Content="960×540" Style="{StaticResource PresetChipStyle}" Margin="0,0,5,0" Click="PresetSize_Click" Tag="960,540"/>
+                            <Button Content="1280×720 (HD)" Style="{StaticResource PresetChipStyle}" Margin="0,0,5,0" Click="PresetSize_Click" Tag="1280,720"/>
+                            <Button Content="1920×1080 (FHD)" Style="{StaticResource PresetChipStyle}" Click="PresetSize_Click" Tag="1920,1080"/>
+                        </StackPanel>
+
+                        <!-- Portrait Presets -->
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="竖屏预设:" FontSize="11" Foreground="#64748B" VerticalAlignment="Center" Margin="0,0,8,0" Width="55"/>
+                            <Button Content="270×480" Style="{StaticResource PresetChipStyle}" Margin="0,0,5,0" Click="PresetSize_Click" Tag="270,480"/>
+                            <Button Content="360×640" Style="{StaticResource PresetChipStyle}" Margin="0,0,5,0" Click="PresetSize_Click" Tag="360,640"/>
+                            <Button Content="540×960" Style="{StaticResource PresetChipStyle}" Margin="0,0,5,0" Click="PresetSize_Click" Tag="540,960"/>
+                            <Button Content="720×1280 (HD)" Style="{StaticResource PresetChipStyle}" Margin="0,0,5,0" Click="PresetSize_Click" Tag="720,1280"/>
+                            <Button Content="1080×1920 (FHD)" Style="{StaticResource PresetChipStyle}" Click="PresetSize_Click" Tag="1080,1920"/>
+                        </StackPanel>
+                    </StackPanel>
+                </Border>
+
+                <!-- Group 3: Corner Radius & Appearance -->
+                <Border Background="#111827" BorderBrush="#1F2937" BorderThickness="1" CornerRadius="12" Padding="16" Margin="0,0,0,12">
+                    <StackPanel>
+                        <TextBlock Text="🎨 卡片外观与圆角" FontSize="13" FontWeight="Bold" Foreground="#F8FAFC" Margin="0,0,0,12"/>
+
+                        <!-- Toggle & Radius Input -->
+                        <CheckBox x:Name="EnableCornerRadiusCheckbox" Content="启用卡片圆角效果" IsChecked="True" Margin="0,0,0,10" Checked="EnableCornerRadius_Changed" Unchecked="EnableCornerRadius_Changed"/>
+
+                        <StackPanel x:Name="CornerRadiusPanel">
+                            <TextBlock Text="圆角大小 (像素, 0 ~ 100)" Foreground="#94A3B8" FontSize="12" Margin="0,0,0,5"/>
+                            <TextBox x:Name="CornerRadiusInput" Text="16" Margin="0,0,0,8"/>
+
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="快捷预设:" FontSize="11" Foreground="#64748B" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                                <Button Content="直角 (0px)" Style="{StaticResource PresetChipStyle}" Margin="0,0,5,0" Click="PresetCorner_Click" Tag="0"/>
+                                <Button Content="小圆角 (8px)" Style="{StaticResource PresetChipStyle}" Margin="0,0,5,0" Click="PresetCorner_Click" Tag="8"/>
+                                <Button Content="标准圆角 (16px)" Style="{StaticResource PresetChipStyle}" Margin="0,0,5,0" Click="PresetCorner_Click" Tag="16"/>
+                                <Button Content="大圆角 (24px)" Style="{StaticResource PresetChipStyle}" Margin="0,0,5,0" Click="PresetCorner_Click" Tag="24"/>
+                                <Button Content="超大圆角 (32px)" Style="{StaticResource PresetChipStyle}" Click="PresetCorner_Click" Tag="32"/>
+                            </StackPanel>
+                        </StackPanel>
+                    </StackPanel>
+                </Border>
+
+                <!-- Group 4: Interval & Toggles -->
+                <Border Background="#111827" BorderBrush="#1F2937" BorderThickness="1" CornerRadius="12" Padding="16">
+                    <StackPanel>
+                        <TextBlock Text="⏱️ 轮播与自动化控制" FontSize="13" FontWeight="Bold" Foreground="#F8FAFC" Margin="0,0,0,12"/>
+
+                        <!-- Interval Input & Quick Chips -->
+                        <TextBlock Text="切换间隔 (秒, 5 ~ 86400)" Foreground="#94A3B8" FontSize="12" Margin="0,0,0,5"/>
+                        <TextBox x:Name="IntervalInput" Text="60" Margin="0,0,0,8"/>
+
+                        <StackPanel Orientation="Horizontal" Margin="0,0,0,14">
+                            <TextBlock Text="快捷秒数:" FontSize="11" Foreground="#64748B" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                            <Button Content="15秒" Style="{StaticResource PresetChipStyle}" Margin="0,0,5,0" Click="PresetInterval_Click" Tag="15"/>
+                            <Button Content="30秒" Style="{StaticResource PresetChipStyle}" Margin="0,0,5,0" Click="PresetInterval_Click" Tag="30"/>
+                            <Button Content="1分钟" Style="{StaticResource PresetChipStyle}" Margin="0,0,5,0" Click="PresetInterval_Click" Tag="60"/>
+                            <Button Content="5分钟" Style="{StaticResource PresetChipStyle}" Margin="0,0,5,0" Click="PresetInterval_Click" Tag="300"/>
+                            <Button Content="10分钟" Style="{StaticResource PresetChipStyle}" Margin="0,0,5,0" Click="PresetInterval_Click" Tag="600"/>
+                            <Button Content="1小时" Style="{StaticResource PresetChipStyle}" Click="PresetInterval_Click" Tag="3600"/>
+                        </StackPanel>
+
+                        <!-- Status Toggles -->
+                        <StackPanel Orientation="Horizontal">
+                            <CheckBox x:Name="PausedCheckbox" Content="暂停自动轮播" VerticalAlignment="Center" Margin="0,0,24,0"/>
+                            <CheckBox x:Name="VisibleCheckbox" Content="显示此桌面组件" VerticalAlignment="Center" IsChecked="True"/>
+                        </StackPanel>
+                    </StackPanel>
+                </Border>
+            </StackPanel>
+        </ScrollViewer>
+
+        <!-- Sticky Bottom Action Bar -->
+        <Border Grid.Row="2" Background="#111827" BorderBrush="#1F2937" BorderThickness="1" CornerRadius="12" Padding="14,10">
+            <Grid>
+                <Button Content="🔀 立即换图 (下一张)" HorizontalAlignment="Left" Style="{StaticResource SecondaryActionBtn}" Click="SwitchNow_Click"/>
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                    <Button Content="取消" Style="{StaticResource SecondaryActionBtn}" Margin="0,0,8,0" Click="Cancel_Click"/>
+                    <Button Content="💾 保存并应用" Style="{StaticResource PrimaryActionBtn}" Click="Save_Click"/>
+                </StackPanel>
+            </Grid>
+        </Border>
+    </Grid>
+</Window>

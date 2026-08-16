@@ -1,0 +1,30 @@
+## .NET / C# / Visual Studio
+bin/
+obj/
+*.user
+*.userosscache
+*.sln.docstates
+*.suo
+*.userprefs
+*.dbmdl
+*.jfm
+.vs/
+.vscode/
+.idea/
+
+## Build Outputs
+publish/
+dist/
+*.pdb
+
+## Local Databases & Caches
+*.db-shm
+*.db-wal
+*.log
+local_cache/
+temp/
+
+## OS Files
+Thumbs.db
+Desktop.ini
+.DS_Store

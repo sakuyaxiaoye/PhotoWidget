@@ -75,6 +75,15 @@ public sealed class WidgetScheduler : IDisposable
         _scanCts?.Dispose();
         _scanCts = new CancellationTokenSource();
 
+        // Reset playback tracking for new picture source
+        _lastShownPath = null;
+        _lastShownId = null;
+        _history.Clear();
+        lock (_predecodeLock)
+        {
+            _predecodedItem = null;
+        }
+
         var rootPath = _config.RootPath;
         if (string.IsNullOrWhiteSpace(rootPath))
         {
@@ -125,7 +134,7 @@ public sealed class WidgetScheduler : IDisposable
             _window.UpdateCandidateCount(_rootContext.CurrentSnapshot.Count);
             if (!_rootContext.CurrentSnapshot.IsEmpty)
             {
-                // Hot startup: zero-wait instant display & immediately start rotation timer
+                // Hot startup / cached catalog: zero-wait instant display & immediately start rotation timer
                 SwitchNext();
                 ResetTimer();
             }
@@ -158,9 +167,12 @@ public sealed class WidgetScheduler : IDisposable
                     {
                         _window.ShowPlaceholder("文件夹内未找到支持的图片", "支持格式: JPG, JPEG, PNG, WebP, AVIF, HEIC, GIF 等");
                     }
-                    else if (_lastShownPath == null)
+                    else
                     {
-                        SwitchNext();
+                        if (_lastShownPath == null)
+                        {
+                            SwitchNext();
+                        }
                         ResetTimer();
                     }
                 });
@@ -182,10 +194,13 @@ public sealed class WidgetScheduler : IDisposable
             {
                 _window.ShowPlaceholder("文件夹内未找到支持的图片", "支持格式: JPG, JPEG, PNG, WebP, AVIF, HEIC, GIF 等");
             }
-            else if (_lastShownPath == null)
+            else
             {
-                SwitchNext();
-                ResetTimer();
+                if (_lastShownPath == null)
+                {
+                    SwitchNext();
+                    ResetTimer();
+                }
             }
         });
     }

@@ -51,6 +51,45 @@ public partial class WidgetWindow : Window
         ContentHost.SizeChanged += (s, e) => UpdateContentClip();
         MouseEnter += OnMouseEnterWindow;
         MouseLeave += OnMouseLeaveWindow;
+        Drop += OnWindowDrop;
+        DragOver += OnWindowDragOver;
+    }
+
+    private void OnWindowDragOver(object sender, DragEventArgs e)
+    {
+        if (e.Data.GetDataPresent(DataFormats.FileDrop))
+        {
+            e.Effects = DragDropEffects.Copy;
+            e.Handled = true;
+        }
+        else
+        {
+            e.Effects = DragDropEffects.None;
+        }
+    }
+
+    private void OnWindowDrop(object sender, DragEventArgs e)
+    {
+        if (e.Data.GetDataPresent(DataFormats.FileDrop))
+        {
+            var files = (string[]?)e.Data.GetData(DataFormats.FileDrop);
+            if (files != null && files.Length > 0)
+            {
+                string path = files[0];
+                if (Directory.Exists(path))
+                {
+                    _config.RootPath = path;
+                    SettingsService.Instance.SaveImmediate();
+                    _scheduler?.RescanAndPlay();
+                }
+                else if (File.Exists(path) && Path.GetDirectoryName(path) is { } parentDir && Directory.Exists(parentDir))
+                {
+                    _config.RootPath = parentDir;
+                    SettingsService.Instance.SaveImmediate();
+                    _scheduler?.RescanAndPlay();
+                }
+            }
+        }
     }
 
     private void OnWindowLocationChanged(object? sender, EventArgs e)

@@ -19,7 +19,8 @@
         TextOptions.TextFormattingMode="Display"
         TextOptions.TextRenderingMode="ClearType"
         FontFamily="Segoe UI Variable Display, Segoe UI, Microsoft YaHei UI"
-        RenderOptions.BitmapScalingMode="HighQuality">
+        RenderOptions.BitmapScalingMode="HighQuality"
+        AllowDrop="True">
     <Window.Resources>
         <!-- Modern Minimalist Icon Button -->
         <Style x:Key="AdaptiveIconButton" TargetType="Button">

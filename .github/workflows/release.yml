@@ -1,0 +1,79 @@
+name: Build and Release PhotoWidget
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build-and-release:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Run automated tests
+        run: dotnet test --configuration Release
+
+      - name: Install Inno Setup
+        run: choco install innosetup -y
+
+      - name: Publish application
+        shell: pwsh
+        run: |
+          $distDir = "dist"
+          $appDir = "$distDir\PhotoWidget-v1.0.0-win-x64"
+          New-Item -ItemType Directory -Path $appDir -Force | Out-Null
+          
+          # Publish framework-dependent release
+          dotnet publish src/DesktopPicture.App/DesktopPicture.App.csproj -c Release -r win-x64 --self-contained false -o $appDir
+          
+          # Remove PDB debug symbols
+          Get-ChildItem -Path $appDir -Filter "*.pdb" | Remove-Item -Force
+          
+          # Copy license & readme
+          Copy-Item "README.md" "$appDir\" -Force
+          Copy-Item "LICENSE" "$appDir\" -Force
+          
+          # Compress into Portable ZIP
+          Compress-Archive -Path "$appDir\*" -DestinationPath "$distDir\PhotoWidget-v1.0.0-win-x64.zip" -Force
+
+      - name: Build Inno Setup Installer
+        run: |
+          & "C:\Program Files (x86)\Inno Setup 6\ISCC.exe" "installer\PhotoWidget.iss"
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        if: startsWith(github.ref, 'refs/tags/')
+        with:
+          name: PhotoWidget ${{ github.ref_name }} (桌面照片组件)
+          body: |
+            ## 🎉 PhotoWidget ${{ github.ref_name }} 正式发布！
+            
+            专为 Windows 10/11 设计的轻量、高性能桌面照片轮播小组件。
+            
+            ### 📦 下载与安装指南：
+            * **🚀 标准安装版**：`PhotoWidget-v1.0.0-Setup.exe`（向导式安装，自动创建快捷方式与卸载项）
+            * **📂 绿色便携版**：`PhotoWidget-v1.0.0-win-x64.zip`（免安装解压即用）
+            
+            ### ✨ 核心亮点：
+            * ⚡ **海量图库毫秒级响应**：Win32 原生底层流读取 + SQLite WAL 紧凑索引；
+            * 🎨 **Windows 11 视觉质感**：平滑 350ms 淡入淡出（Cross-Fade）+ 原生圆角；
+            * 🛡️ **低占用与硬件友好**：内存仅约 35~60MB，锁屏/息屏自动暂停 I/O 与读盘；
+            * 🖥️ **动态壁纸完美兼容**：与 Wallpaper Engine / Lively 等桌面壁纸零冲突、零闪烁；
+            * ⏪ **双向历史穿梭**：滚轮快速翻图，支持随时回看刚播放过的照片。
+          files: |
+            dist/PhotoWidget-v1.0.0-Setup.exe
+            dist/PhotoWidget-v1.0.0-win-x64.zip
+          draft: false
+          prerelease: false

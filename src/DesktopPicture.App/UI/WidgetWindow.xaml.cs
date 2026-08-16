@@ -196,8 +196,6 @@ public partial class WidgetWindow : Window
 
     public void UpdateUiState() => UpdateUiInfo();
 
-    private bool _isPrimaryActive = true;
-
     public void DisplayImage(BitmapSource bitmap, string fullPath)
     {
         _currentFilePath = fullPath;
@@ -228,55 +226,28 @@ public partial class WidgetWindow : Window
             ImagePrimary.Source = bitmap;
             ImagePrimary.Opacity = 1.0;
             ImageSecondary.Opacity = 0.0;
-            _isPrimaryActive = true;
+            ImageSecondary.Source = null;
         }
-        else if (_isPrimaryActive)
+        else
         {
             ImageSecondary.Source = bitmap;
+            ImageSecondary.Opacity = 0.0;
+
             var fadeIn = new System.Windows.Media.Animation.DoubleAnimation(0.0, 1.0, TimeSpan.FromMilliseconds(350))
             {
                 EasingFunction = new System.Windows.Media.Animation.CubicEase { EasingMode = System.Windows.Media.Animation.EasingMode.EaseInOut }
             };
-            var fadeOut = new System.Windows.Media.Animation.DoubleAnimation(1.0, 0.0, TimeSpan.FromMilliseconds(350))
-            {
-                EasingFunction = new System.Windows.Media.Animation.CubicEase { EasingMode = System.Windows.Media.Animation.EasingMode.EaseInOut }
-            };
+
             fadeIn.Completed += (s, e) =>
             {
                 ImagePrimary.Source = bitmap;
                 ImagePrimary.Opacity = 1.0;
+                ImageSecondary.BeginAnimation(UIElement.OpacityProperty, null);
                 ImageSecondary.Opacity = 0.0;
-                ImageSecondary.BeginAnimation(UIElement.OpacityProperty, null);
-                ImagePrimary.BeginAnimation(UIElement.OpacityProperty, null);
-                _isPrimaryActive = true;
+                ImageSecondary.Source = null;
             };
-            _isPrimaryActive = false;
+
             ImageSecondary.BeginAnimation(UIElement.OpacityProperty, fadeIn);
-            ImagePrimary.BeginAnimation(UIElement.OpacityProperty, fadeOut);
-        }
-        else
-        {
-            ImagePrimary.Source = bitmap;
-            var fadeIn = new System.Windows.Media.Animation.DoubleAnimation(0.0, 1.0, TimeSpan.FromMilliseconds(350))
-            {
-                EasingFunction = new System.Windows.Media.Animation.CubicEase { EasingMode = System.Windows.Media.Animation.EasingMode.EaseInOut }
-            };
-            var fadeOut = new System.Windows.Media.Animation.DoubleAnimation(1.0, 0.0, TimeSpan.FromMilliseconds(350))
-            {
-                EasingFunction = new System.Windows.Media.Animation.CubicEase { EasingMode = System.Windows.Media.Animation.EasingMode.EaseInOut }
-            };
-            fadeIn.Completed += (s, e) =>
-            {
-                ImageSecondary.Source = bitmap;
-                ImageSecondary.Opacity = 1.0;
-                ImagePrimary.Opacity = 0.0;
-                ImagePrimary.BeginAnimation(UIElement.OpacityProperty, null);
-                ImageSecondary.BeginAnimation(UIElement.OpacityProperty, null);
-                _isPrimaryActive = false;
-            };
-            _isPrimaryActive = true;
-            ImagePrimary.BeginAnimation(UIElement.OpacityProperty, fadeIn);
-            ImageSecondary.BeginAnimation(UIElement.OpacityProperty, fadeOut);
         }
     }
 

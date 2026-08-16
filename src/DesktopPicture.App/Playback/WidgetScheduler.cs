@@ -24,8 +24,7 @@ public sealed class WidgetScheduler : IDisposable
     private readonly PlaybackHistory _history = new(maxCapacity: 100);
 
     private RootCatalogContext? _rootContext;
-    private Timer? _timer;
-    private Timer? _predecodeTimer;
+    private System.Windows.Threading.DispatcherTimer? _timer;
     private PredecodedItem? _predecodedItem;
     private readonly object _predecodeLock = new();
 
@@ -262,6 +261,10 @@ public sealed class WidgetScheduler : IDisposable
 
             StartupPreviewCache.Instance.SavePreview(_config.Id, predecoded.Bitmap);
             SettingsService.Instance.ScheduleSave(250);
+            DesktopPicture.Diagnostics.MemoryOptimizer.OnImageSwitched();
+
+            // Prepare next predecode immediately in background
+            PredecodeNext();
 
             if (isManual)
             {
@@ -385,50 +388,41 @@ public sealed class WidgetScheduler : IDisposable
         // Save warm startup preview
         StartupPreviewCache.Instance.SavePreview(_config.Id, result.Bitmap);
         SettingsService.Instance.ScheduleSave(250);
-
-        // Schedule pre-decode for the next cycle
-        if (!_config.Paused && !_isDisposed)
-        {
-            int intervalMs = Math.Clamp(_config.IntervalSeconds, 5, 86400) * 1000;
-            int predecodeDelay = Math.Max(1000, intervalMs - 2500);
-            _predecodeTimer?.Dispose();
-            _predecodeTimer = new Timer(_ =>
-            {
-                PredecodeNext();
-            }, null, predecodeDelay, Timeout.Infinite);
-        }
-
         DesktopPicture.Diagnostics.MemoryOptimizer.OnImageSwitched();
+
+        // Prepare next predecode immediately in background
+        PredecodeNext();
     }
 
     public void ResetTimer()
     {
-        _timer?.Dispose();
-        _predecodeTimer?.Dispose();
-
-        lock (_predecodeLock)
+        Application.Current?.Dispatcher.Invoke(() =>
         {
-            _predecodedItem = null;
-        }
-
-        if (_config.Paused) return;
-
-        int intervalMs = Math.Clamp(_config.IntervalSeconds, 5, 86400) * 1000;
-
-        // Schedule pre-decode 2.5 seconds ahead of time
-        int predecodeDelay = Math.Max(1000, intervalMs - 2500);
-        _predecodeTimer = new Timer(_ =>
-        {
-            PredecodeNext();
-        }, null, predecodeDelay, Timeout.Infinite);
-
-        _timer = new Timer(_ =>
-        {
-            if (!_config.Paused && !_isDisposed)
+            if (_timer != null)
             {
-                SwitchNext();
+                _timer.Stop();
+                _timer.Tick -= OnTimerTick;
+                _timer = null;
             }
-        }, null, intervalMs, intervalMs);
+
+            if (_config.Paused || _isDisposed) return;
+
+            int intervalSec = Math.Clamp(_config.IntervalSeconds, 5, 86400);
+            _timer = new System.Windows.Threading.DispatcherTimer(System.Windows.Threading.DispatcherPriority.Background)
+            {
+                Interval = TimeSpan.FromSeconds(intervalSec)
+            };
+            _timer.Tick += OnTimerTick;
+            _timer.Start();
+        });
+    }
+
+    private void OnTimerTick(object? sender, EventArgs e)
+    {
+        if (!_config.Paused && !_isDisposed)
+        {
+            SwitchNext();
+        }
     }
 
     private void PredecodeNext()
@@ -489,10 +483,12 @@ public sealed class WidgetScheduler : IDisposable
         _config.Paused = paused;
         if (paused)
         {
-            _timer?.Dispose();
-            _timer = null;
-            _predecodeTimer?.Dispose();
-            _predecodeTimer = null;
+            if (_timer != null)
+            {
+                _timer.Stop();
+                _timer.Tick -= OnTimerTick;
+                _timer = null;
+            }
             _gifPlayer?.Pause();
         }
         else
@@ -507,10 +503,16 @@ public sealed class WidgetScheduler : IDisposable
         _isDisposed = true;
         _scanCts?.Cancel();
         _scanCts?.Dispose();
-        _timer?.Dispose();
-        _timer = null;
-        _predecodeTimer?.Dispose();
-        _predecodeTimer = null;
+        _scanCts = null;
+
+        if (_timer != null)
+        {
+            _timer.Stop();
+            _timer.Tick -= OnTimerTick;
+            _timer = null;
+        }
+
+        DecodePipeline.Instance.OnDecoded -= HandleImageDecoded;
 
         _gifPlayer?.Dispose();
         _gifPlayer = null;
@@ -521,7 +523,5 @@ public sealed class WidgetScheduler : IDisposable
             CatalogManager.Instance.ReleaseContext(_rootContext.CanonicalRoot);
             _rootContext = null;
         }
-
-        DecodePipeline.Instance.OnDecoded -= HandleImageDecoded;
     }
 }

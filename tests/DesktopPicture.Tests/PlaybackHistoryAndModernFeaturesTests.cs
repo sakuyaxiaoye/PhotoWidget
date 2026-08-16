@@ -222,4 +222,26 @@ public class PlaybackHistoryAndModernFeaturesTests
         Assert.True(File.Exists(icoPath));
         Assert.True(new FileInfo(icoPath).Length > 1000);
     }
+
+    [Fact]
+    public void GenerateUniqueWidgetName_ShouldAvoidDuplicatesAndFillGaps()
+    {
+        var widgets = new System.Collections.Generic.List<DesktopPicture.Config.WidgetConfig>
+        {
+            new() { Id = "1", Name = "照片组件 1" },
+            new() { Id = "3", Name = "照片组件 3" }
+        };
+
+        // Should pick the gap "照片组件 2"
+        string next = DesktopPicture.UI.WidgetController.GenerateUniqueWidgetName(widgets);
+        Assert.Equal("照片组件 2", next);
+
+        // Should de-duplicate requested duplicate name
+        string dupe = DesktopPicture.UI.WidgetController.GenerateUniqueWidgetName(widgets, "照片组件 1");
+        Assert.Equal("照片组件 1 (2)", dupe);
+
+        // Should accept unique custom name
+        string custom = DesktopPicture.UI.WidgetController.GenerateUniqueWidgetName(widgets, "二次元壁纸");
+        Assert.Equal("二次元壁纸", custom);
+    }
 }

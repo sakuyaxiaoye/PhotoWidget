@@ -1,9 +1,11 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Windows;
 using DesktopPicture.Config;
 using DesktopPicture.Decoding;
+using DesktopPicture.Display;
 using DesktopPicture.Logging;
 
 namespace DesktopPicture.UI;
@@ -18,6 +20,40 @@ public sealed class WidgetController
 
     public IReadOnlyDictionary<string, WidgetWindow> ActiveWindows => _activeWindows;
 
+    public static string GenerateUniqueWidgetName(IEnumerable<WidgetConfig> existingWidgets, string? requestedName = null)
+    {
+        var existingNames = new HashSet<string>(existingWidgets.Select(w => w.Name), StringComparer.OrdinalIgnoreCase);
+
+        if (!string.IsNullOrWhiteSpace(requestedName))
+        {
+            string clean = requestedName.Trim();
+            if (!existingNames.Contains(clean))
+            {
+                return clean;
+            }
+
+            for (int i = 2; i <= 100; i++)
+            {
+                string candidate = $"{clean} ({i})";
+                if (!existingNames.Contains(candidate))
+                {
+                    return candidate;
+                }
+            }
+        }
+
+        for (int i = 1; i <= 100; i++)
+        {
+            string candidate = $"照片组件 {i}";
+            if (!existingNames.Contains(candidate))
+            {
+                return candidate;
+            }
+        }
+
+        return $"照片组件 {Guid.NewGuid().ToString("N")[..4]}";
+    }
+
     public void Initialize()
     {
         var settings = SettingsService.Instance.Current;
@@ -26,7 +62,8 @@ public sealed class WidgetController
             var defaultWidget = new WidgetConfig
             {
                 Id = Guid.NewGuid().ToString("D"),
-                Name = "图片组件 1",
+                Name = "照片组件 1",
+                RootPath = Environment.GetFolderPath(Environment.SpecialFolder.MyPictures),
                 WidthDip = 480,
                 HeightDip = 270,
                 IntervalSeconds = 60,
@@ -87,17 +124,36 @@ public sealed class WidgetController
             return false;
         }
 
-        int nextIndex = settings.Widgets.Count + 1;
+        string uniqueName = GenerateUniqueWidgetName(settings.Widgets, name);
+
+        // Inherit path from existing active widget or default to MyPictures
+        string rootPath = settings.Widgets.FirstOrDefault(w => !string.IsNullOrEmpty(w.RootPath) && Directory.Exists(w.RootPath))?.RootPath
+                          ?? Environment.GetFolderPath(Environment.SpecialFolder.MyPictures);
+
+        // Cascade position relative to last active window
+        double lastLeft = 40;
+        double lastTop = 40;
+        if (_activeWindows.Values.LastOrDefault() is { } lastWin)
+        {
+            lastLeft = lastWin.Left + 50;
+            lastTop = lastWin.Top + 50;
+        }
+
+        var (safeLeft, safeTop) = DisplayCoordinateService.Instance.EnsureVisibleOnScreen(lastLeft, lastTop, 480, 270);
+
         var config = new WidgetConfig
         {
             Id = Guid.NewGuid().ToString("D"),
-            Name = name ?? $"图片组件 {nextIndex}",
+            Name = uniqueName,
+            RootPath = rootPath,
             WidthDip = 480,
             HeightDip = 270,
             IntervalSeconds = 60,
-            LeftDip = 40 + (nextIndex - 1) * 60,
-            TopDip = 40 + (nextIndex - 1) * 60,
-            Visible = true
+            LeftDip = safeLeft,
+            TopDip = safeTop,
+            Visible = true,
+            EnableCornerRadius = true,
+            CornerRadius = 12
         };
 
         settings.Widgets.Add(config);

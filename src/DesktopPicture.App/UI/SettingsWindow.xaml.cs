@@ -44,7 +44,12 @@ public partial class SettingsWindow : Window
 
     private void Save_Click(object sender, RoutedEventArgs e)
     {
-        string name = string.IsNullOrWhiteSpace(NameInput.Text) ? _config.Name : NameInput.Text.Trim();
+        string rawName = string.IsNullOrWhiteSpace(NameInput.Text) ? _config.Name : NameInput.Text.Trim();
+        
+        // Prevent duplicate widget names across instances
+        var otherWidgets = SettingsService.Instance.Current.Widgets.Where(w => w.Id != _config.Id);
+        string name = WidgetController.GenerateUniqueWidgetName(otherWidgets, rawName);
+
         string rootPath = RootPathInput.Text.Trim();
 
         if (!double.TryParse(WidthInput.Text, out double newWidth)) newWidth = _config.WidthDip;

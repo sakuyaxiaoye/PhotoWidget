@@ -58,13 +58,12 @@
                 CornerRadius="16"
                 Background="#0F172A"
                 BorderBrush="#25FFFFFF"
-                BorderThickness="1"
-                ClipToBounds="True">
+                BorderThickness="1">
             <Border.Effect>
                 <DropShadowEffect Color="#000000" BlurRadius="16" Opacity="0.45" ShadowDepth="4" Direction="270"/>
             </Border.Effect>
 
-            <Grid>
+            <Grid x:Name="ContentHost">
                 <!-- Dual Overlapping Image Layer for 350ms Hardware-Accelerated Cross-Fade -->
                 <Grid x:Name="ImageContainer" Visibility="Collapsed">
                     <Image x:Name="ImagePrimary"

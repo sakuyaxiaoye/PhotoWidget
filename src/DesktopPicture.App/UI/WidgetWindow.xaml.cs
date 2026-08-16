@@ -46,6 +46,7 @@ public partial class WidgetWindow : Window
         Loaded += OnLoaded;
         Closed += OnClosed;
         SizeChanged += OnWindowSizeChanged;
+        ContentHost.SizeChanged += (s, e) => UpdateContentClip();
         MouseEnter += OnMouseEnterWindow;
         MouseLeave += OnMouseLeaveWindow;
     }
@@ -91,6 +92,18 @@ public partial class WidgetWindow : Window
         _scheduler.Start();
     }
 
+    private void UpdateContentClip()
+    {
+        if (ContentHost.ActualWidth <= 0 || ContentHost.ActualHeight <= 0) return;
+        int radius = _config.EnableCornerRadius ? Math.Clamp(_config.CornerRadius, 0, 100) : 0;
+        CardBorder.CornerRadius = new CornerRadius(radius);
+
+        ContentHost.Clip = new System.Windows.Media.RectangleGeometry(
+            new Rect(0, 0, ContentHost.ActualWidth, ContentHost.ActualHeight),
+            radius,
+            radius);
+    }
+
     public void ApplyPositionAndAttach()
     {
         if (_hwnd == IntPtr.Zero) return;
@@ -120,9 +133,7 @@ public partial class WidgetWindow : Window
         CoordsText.Text = $"位置: ({(int)_config.LeftDip}, {(int)_config.TopDip}) | 尺寸: {(int)_config.WidthDip} × {(int)_config.HeightDip}";
         StatusBadge.Text = _config.Paused ? "已暂停" : "运行中";
 
-        // Apply dynamic corner radius
-        int radius = _config.EnableCornerRadius ? Math.Clamp(_config.CornerRadius, 0, 100) : 0;
-        CardBorder.CornerRadius = new CornerRadius(radius);
+        UpdateContentClip();
     }
 
     public void UpdateUiState() => UpdateUiInfo();

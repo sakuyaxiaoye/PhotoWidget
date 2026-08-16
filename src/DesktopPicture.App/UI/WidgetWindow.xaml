@@ -210,11 +210,6 @@
                         </StackPanel>
                     </Grid>
                 </Border>
-
-                <!-- Modern Minimalist Corner Resize Grip -->
-                <Canvas HorizontalAlignment="Right" VerticalAlignment="Bottom" Width="14" Height="14" Margin="0,0,5,5" IsHitTestVisible="False" Opacity="0.35">
-                    <Path Data="M 10,2 L 2,10 M 10,6 L 6,10 M 10,10 L 10,10" Stroke="#FFFFFF" StrokeThickness="1.5" StrokeStartLineCap="Round" StrokeEndLineCap="Round"/>
-                </Canvas>
             </Grid>
         </Border>
     </Grid>

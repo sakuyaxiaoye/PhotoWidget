@@ -148,7 +148,7 @@ public partial class WidgetWindow : Window
         _scheduler.Start();
     }
 
-    public const int Windows11CornerRadius = 12;
+    public const int Windows11CornerRadius = 8;
 
     private void UpdateContentClip()
     {

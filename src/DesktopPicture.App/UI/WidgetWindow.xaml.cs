@@ -92,10 +92,12 @@ public partial class WidgetWindow : Window
         _scheduler.Start();
     }
 
+    public const int Windows11CornerRadius = 12;
+
     private void UpdateContentClip()
     {
         if (ContentHost.ActualWidth <= 0 || ContentHost.ActualHeight <= 0) return;
-        int radius = _config.EnableCornerRadius ? Math.Clamp(_config.CornerRadius, 0, 100) : 0;
+        int radius = _config.EnableCornerRadius ? Windows11CornerRadius : 0;
         CardBorder.CornerRadius = new CornerRadius(radius);
 
         ContentHost.Clip = new System.Windows.Media.RectangleGeometry(

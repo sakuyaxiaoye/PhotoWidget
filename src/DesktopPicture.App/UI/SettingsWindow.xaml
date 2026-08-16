@@ -242,24 +242,10 @@
                 <!-- Group 3: Corner Radius & Appearance -->
                 <Border Background="#111827" BorderBrush="#1F2937" BorderThickness="1" CornerRadius="12" Padding="16" Margin="0,0,0,12">
                     <StackPanel>
-                        <TextBlock Text="🎨 卡片外观与圆角" FontSize="13" FontWeight="Bold" Foreground="#F8FAFC" Margin="0,0,0,12"/>
+                        <TextBlock Text="🎨 外观风格" FontSize="13" FontWeight="Bold" Foreground="#F8FAFC" Margin="0,0,0,10"/>
 
-                        <!-- Toggle & Radius Input -->
-                        <CheckBox x:Name="EnableCornerRadiusCheckbox" Content="启用卡片圆角效果" IsChecked="True" Margin="0,0,0,10" Checked="EnableCornerRadius_Changed" Unchecked="EnableCornerRadius_Changed"/>
-
-                        <StackPanel x:Name="CornerRadiusPanel">
-                            <TextBlock Text="圆角大小 (像素, 0 ~ 100)" Foreground="#94A3B8" FontSize="12" Margin="0,0,0,5"/>
-                            <TextBox x:Name="CornerRadiusInput" Text="16" Margin="0,0,0,8"/>
-
-                            <StackPanel Orientation="Horizontal">
-                                <TextBlock Text="快捷预设:" FontSize="11" Foreground="#64748B" VerticalAlignment="Center" Margin="0,0,8,0"/>
-                                <Button Content="直角 (0px)" Style="{StaticResource PresetChipStyle}" Margin="0,0,5,0" Click="PresetCorner_Click" Tag="0"/>
-                                <Button Content="小圆角 (8px)" Style="{StaticResource PresetChipStyle}" Margin="0,0,5,0" Click="PresetCorner_Click" Tag="8"/>
-                                <Button Content="标准圆角 (16px)" Style="{StaticResource PresetChipStyle}" Margin="0,0,5,0" Click="PresetCorner_Click" Tag="16"/>
-                                <Button Content="大圆角 (24px)" Style="{StaticResource PresetChipStyle}" Margin="0,0,5,0" Click="PresetCorner_Click" Tag="24"/>
-                                <Button Content="超大圆角 (32px)" Style="{StaticResource PresetChipStyle}" Click="PresetCorner_Click" Tag="32"/>
-                            </StackPanel>
-                        </StackPanel>
+                        <!-- Toggle -->
+                        <CheckBox x:Name="EnableCornerRadiusCheckbox" Content="启用 Windows 11 风格圆角 (关闭则为直角风格)" IsChecked="True"/>
                     </StackPanel>
                 </Border>
 

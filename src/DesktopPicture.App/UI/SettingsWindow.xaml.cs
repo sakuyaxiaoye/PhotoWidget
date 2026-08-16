@@ -25,10 +25,7 @@ public partial class SettingsWindow : Window
         IntervalInput.Text = _config.IntervalSeconds.ToString();
         PausedCheckbox.IsChecked = _config.Paused;
         VisibleCheckbox.IsChecked = _config.Visible;
-
         EnableCornerRadiusCheckbox.IsChecked = _config.EnableCornerRadius;
-        CornerRadiusInput.Text = _config.CornerRadius.ToString();
-        CornerRadiusPanel.Visibility = _config.EnableCornerRadius ? Visibility.Visible : Visibility.Collapsed;
     }
 
     private void BrowseFolder_Click(object sender, RoutedEventArgs e)
@@ -53,12 +50,10 @@ public partial class SettingsWindow : Window
         if (!double.TryParse(WidthInput.Text, out double newWidth)) newWidth = _config.WidthDip;
         if (!double.TryParse(HeightInput.Text, out double newHeight)) newHeight = _config.HeightDip;
         if (!int.TryParse(IntervalInput.Text, out int newInterval)) newInterval = _config.IntervalSeconds;
-        if (!int.TryParse(CornerRadiusInput.Text, out int newRadius)) newRadius = _config.CornerRadius;
 
         newWidth = Math.Clamp(newWidth, 90, 3840);
         newHeight = Math.Clamp(newHeight, 90, 3840);
         newInterval = Math.Clamp(newInterval, 5, 86400);
-        newRadius = Math.Clamp(newRadius, 0, 100);
 
         bool pathChanged = !string.Equals(_config.RootPath, rootPath, StringComparison.OrdinalIgnoreCase);
         bool sizeChanged = Math.Abs(_config.WidthDip - newWidth) > 0.1 || Math.Abs(_config.HeightDip - newHeight) > 0.1;
@@ -90,7 +85,6 @@ public partial class SettingsWindow : Window
         _config.Paused = PausedCheckbox.IsChecked == true;
         _config.Visible = VisibleCheckbox.IsChecked == true;
         _config.EnableCornerRadius = EnableCornerRadiusCheckbox.IsChecked == true;
-        _config.CornerRadius = newRadius;
 
         SettingsService.Instance.SaveImmediate();
 
@@ -143,22 +137,6 @@ public partial class SettingsWindow : Window
         if (sender is Button btn && btn.Tag is string tag)
         {
             IntervalInput.Text = tag;
-        }
-    }
-
-    private void PresetCorner_Click(object sender, RoutedEventArgs e)
-    {
-        if (sender is Button btn && btn.Tag is string tag)
-        {
-            CornerRadiusInput.Text = tag;
-        }
-    }
-
-    private void EnableCornerRadius_Changed(object sender, RoutedEventArgs e)
-    {
-        if (CornerRadiusPanel != null)
-        {
-            CornerRadiusPanel.Visibility = EnableCornerRadiusCheckbox.IsChecked == true ? Visibility.Visible : Visibility.Collapsed;
         }
     }
 

@@ -28,7 +28,7 @@ public sealed class SqliteCatalogDatabase : IDisposable
     {
         var dbDir = customDbPath != null ? Path.GetDirectoryName(customDbPath)! : Path.Combine(
             Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-            "DesktopPicture");
+            "PhotoWidget");
 
         Directory.CreateDirectory(dbDir);
         _dbPath = customDbPath ?? Path.Combine(dbDir, "catalog.db");

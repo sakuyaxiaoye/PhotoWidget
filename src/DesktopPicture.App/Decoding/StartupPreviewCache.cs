@@ -16,7 +16,7 @@ public sealed class StartupPreviewCache
     {
         _cacheDir = customDir ?? Path.Combine(
             Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-            "DesktopPicture",
+            "PhotoWidget",
             "cache",
             "startup");
 

@@ -284,7 +284,7 @@ public sealed class TrayIconService : IDisposable
         };
         openDirItem.Click += (s, e) =>
         {
-            var appData = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "DesktopPicture");
+            var appData = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "PhotoWidget");
             if (Directory.Exists(appData))
             {
                 Process.Start(new ProcessStartInfo("explorer.exe", appData) { UseShellExecute = true });

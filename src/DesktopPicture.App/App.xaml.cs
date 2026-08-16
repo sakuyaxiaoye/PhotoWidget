@@ -70,17 +70,30 @@ public partial class App : Application
         catch (Exception ex)
         {
             AppLogger.Instance.Error("Fatal error during startup", ex);
-            MessageBox.Show($"程序启动失败: {ex.Message}\n请查看日志: %LocalAppData%\\DesktopPicture\\logs", "Desktop Picture 错误", MessageBoxButton.OK, MessageBoxImage.Error);
+            MessageBox.Show($"程序启动失败: {ex.Message}\n请查看日志: %LocalAppData%\\PhotoWidget\\logs", "PhotoWidget 错误", MessageBoxButton.OK, MessageBoxImage.Error);
             Shutdown();
         }
     }
 
     protected override void OnExit(ExitEventArgs e)
     {
-        AppLogger.Instance.Info("=== Desktop Picture Shutting Down ===");
+        AppLogger.Instance.Info("=== PhotoWidget Shutting Down ===");
 
         try
         {
+            foreach (var pair in WidgetController.Instance.ActiveWindows)
+            {
+                var win = pair.Value;
+                if (!double.IsNaN(win.Left) && !double.IsNaN(win.Top))
+                {
+                    win.Config.LeftDip = win.Left;
+                    win.Config.TopDip = win.Top;
+                    win.Config.WidthDip = win.Width;
+                    win.Config.HeightDip = win.Height;
+                }
+            }
+            SettingsService.Instance.SaveImmediate();
+
             WidgetController.Instance.CloseAll();
             SettingsService.Instance.Dispose();
             TrayIconService.Instance.Dispose();

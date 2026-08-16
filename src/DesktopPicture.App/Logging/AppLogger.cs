@@ -20,7 +20,7 @@ public sealed class AppLogger
     {
         _logDir = Path.Combine(
             Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-            "DesktopPicture",
+            "PhotoWidget",
             "logs");
 
         Directory.CreateDirectory(_logDir);

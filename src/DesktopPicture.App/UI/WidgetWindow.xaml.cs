@@ -36,6 +36,7 @@ public partial class WidgetWindow : Window
         InitializeComponent();
         _config = config;
 
+        WindowStartupLocation = WindowStartupLocation.Manual;
         Width = _config.WidthDip;
         Height = _config.HeightDip;
         Left = _config.LeftDip;
@@ -45,10 +46,21 @@ public partial class WidgetWindow : Window
 
         Loaded += OnLoaded;
         Closed += OnClosed;
+        LocationChanged += OnWindowLocationChanged;
         SizeChanged += OnWindowSizeChanged;
         ContentHost.SizeChanged += (s, e) => UpdateContentClip();
         MouseEnter += OnMouseEnterWindow;
         MouseLeave += OnMouseLeaveWindow;
+    }
+
+    private void OnWindowLocationChanged(object? sender, EventArgs e)
+    {
+        if (IsLoaded && !double.IsNaN(Left) && !double.IsNaN(Top))
+        {
+            _config.LeftDip = Left;
+            _config.TopDip = Top;
+            SettingsService.Instance.ScheduleSave(250);
+        }
     }
 
     private void OnMouseEnterWindow(object sender, MouseEventArgs e)
@@ -71,6 +83,11 @@ public partial class WidgetWindow : Window
         {
             _config.WidthDip = e.NewSize.Width;
             _config.HeightDip = e.NewSize.Height;
+            if (!double.IsNaN(Left) && !double.IsNaN(Top))
+            {
+                _config.LeftDip = Left;
+                _config.TopDip = Top;
+            }
             UpdateUiInfo();
             SettingsService.Instance.ScheduleSave(250);
 
@@ -548,6 +565,15 @@ public partial class WidgetWindow : Window
 
     private void OnClosed(object? sender, EventArgs e)
     {
+        if (!double.IsNaN(Left) && !double.IsNaN(Top))
+        {
+            _config.LeftDip = Left;
+            _config.TopDip = Top;
+            _config.WidthDip = Width;
+            _config.HeightDip = Height;
+            SettingsService.Instance.SaveImmediate();
+        }
+
         _scheduler?.Dispose();
         _scheduler = null;
 

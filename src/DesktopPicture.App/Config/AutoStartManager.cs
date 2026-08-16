@@ -85,7 +85,7 @@ public static class AutoStartManager
             // If user configured autostart or registry has it, ensure registry has the current exact path
             if (settings.StartWithWindows || registryEnabled)
             {
-                SetAutoStart(settings.StartWithWindows);
+                SetAutoStart(true);
             }
         }
         catch (Exception ex)

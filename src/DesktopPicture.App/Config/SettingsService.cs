@@ -29,8 +29,9 @@ public sealed class SettingsService : IDisposable
     {
         _settingsDir = customDir ?? Path.Combine(
             Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-            "DesktopPicture");
+            "PhotoWidget");
 
+        EnsureMigration();
         Directory.CreateDirectory(_settingsDir);
         _settingsPath = Path.Combine(_settingsDir, "settings.json");
         _backupPath = Path.Combine(_settingsDir, "settings.json.bak");
@@ -42,6 +43,26 @@ public sealed class SettingsService : IDisposable
         };
 
         _currentSettings = LoadInternal();
+    }
+
+    private static void EnsureMigration()
+    {
+        try
+        {
+            var oldDir = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "DesktopPicture");
+            var newDir = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "PhotoWidget");
+
+            if (Directory.Exists(oldDir) && !Directory.Exists(newDir))
+            {
+                Directory.CreateDirectory(newDir);
+                foreach (var file in Directory.GetFiles(oldDir))
+                {
+                    var dest = Path.Combine(newDir, Path.GetFileName(file));
+                    if (!File.Exists(dest)) File.Copy(file, dest, overwrite: true);
+                }
+            }
+        }
+        catch { }
     }
 
     public AppSettings Load()

@@ -1,119 +1,97 @@
 <div align="center">
 
-# 🖼️ 桌面照片组件 (PhotoWidget)
+# PhotoWidget (桌面照片组件)
 
-**专为海量图库打造的 Windows 桌面极简照片轮播小组件**  
-*零壁纸闪烁 · 300万机械盘毫秒级秒开 · 350ms丝滑淡入淡出 · 智能色彩自适应 · 硬盘寿命休眠保护*
+一个轻量、高性能的 Windows 桌面照片轮播小组件。
+
+专为拥有海量本地图片（支持机械硬盘 300W+ 图库）的用户设计，在保证极低资源占用的同时，提供丝滑的视觉过渡与良好的桌面交互体验。
 
 [![.NET 10.0](https://img.shields.io/badge/.NET-10.0--windows-512BD4?logo=dotnet&logoColor=white)](https://dotnet.microsoft.com/)
 [![Platform](https://img.shields.io/badge/Platform-Windows%2010%20%7C%2011-0078D6?logo=windows&logoColor=white)](https://www.microsoft.com/windows)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Database](https://img.shields.io/badge/Catalog-SQLite%20WAL%20%2B%20MMAP-003B57?logo=sqlite&logoColor=white)](https://sqlite.org/)
-[![Rendering](https://img.shields.io/badge/Rendering-SkiaSharp%20%2B%20WPF-EC5975?logo=nuget&logoColor=white)](https://github.com/mono/SkiaSharp)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 
-<p align="center">
-  <img src="src/DesktopPicture.App/Resources/app.png" width="160" height="160" alt="PhotoWidget Logo" />
-</p>
+<br/>
+<img src="src/DesktopPicture.App/Resources/app.png" width="128" height="128" alt="PhotoWidget Logo" />
+<br/>
 
 </div>
 
 ---
 
-## ✨ 核心特性 (Features)
+## 为什么做这个项目？
 
-### ⚡ 1. 300万+ 本地机械硬盘极速引擎
-* **Win32 `LARGE_FETCH` 物理连续深度扫描**：直接绕过传统慢速 .NET 递归与二次属性寻道，300 万张机械硬盘（HDD）图库启动后毫秒级展示首图，后台静默并行建库。
-* **SQLite MMAP + WAL 索引**：单图查询响应时间 `< 0.1ms`，零磁盘反复寻道开销。
-* **2.5秒提前预解码管道**：换图倒计时结束前 2.5 秒提前在内存预热解码下一张图与色彩主题，换图时刻 **0 延迟、0 磁盘寻道等待** 瞬间呈现。
+市面上的桌面相框或壁纸小工具在日常使用中常遇到几个痛点：
+1. **大图库卡顿**：本地图片多达数万甚至上百万张时，常规软件扫描目录极慢，甚至导致整个应用卡死；
+2. **机械硬盘（HDD）损伤**：普通轮播会在每次换图时临时读盘，机械硬盘频繁寻道不仅有噪音，还容易影响硬盘寿命；
+3. **动态壁纸冲突**：很多桌面挂载工具会导致 Wallpaper Engine 或 Lively Wallpaper 频繁闪烁、重绘失效；
+4. **UI 生硬**：切换图片没有过渡动效，或者界面风格与桌面壁纸格格不入。
 
-### 🎨 2. 视觉动效与自适应磨砂质感
-* **350ms 硬件加速淡入淡出（Cross-Fade）**：采用双层交替缓冲区与 `CubicEase` 缓动动画，换图丝滑优雅，消除生硬瞬切。
-* **智能色彩提取（Adaptive Palette）**：实时计算底图感知明度与色调，悬浮条与控制按钮自动变幻为与底图高度契合的温润毛玻璃或深邃透光质感。
-* **EXIF 方向自适应纠偏**：手机立绘与单反竖拍照片自动识别 90°/180°/270° 纠偏展示。
-* **自由调节圆角（0 ~ 100px）**：支持在设置中随意调整卡片圆角大小，或一键切换极客无圆角直角。
-
-### 🛡️ 3. 机械硬盘寿命与能耗管理 (HDD Protection)
-* **会话与熄屏感知**：智能监听 Windows `Win + L` 锁屏与显示器休眠事件。
-* **100% 暂停磁盘 I/O**：熄屏或离席时立即暂停轮播与预解码，避免机械硬盘磁头无谓寻道磨损与发热。
-
-### ⏪ 4. 双向 100 步历史记录穿梭
-* **自由回退与前进**：支持回看刚才播放过的图片（`‹` 按钮），再次前进时同样享受预热瞬切，到达末尾后才抽取新图。
-* **鼠标手势**：鼠标停在组件上，**向上滚轮**（上一张）/ **向下滚轮**（下一张）极速翻阅。
-
-### 🖥️ 5. Wallpaper Engine 零闪烁桌面嵌入
-* **双层智能宿主架构**：采用 `BottomWindowHost` 与 `ExplorerDesktopHost` 双重 Win32 挂载机制；
-* **动态壁纸安全互斥**：自动检测 Wallpaper Engine、Lively 等动态壁纸，彻底杜绝 `0x052C` 桌面重绘导致的闪烁问题。
-
-### 📁 6. 全现代图片格式生态
-* 原生支持：`.jpg`, `.jpeg`, `.png`, `.webp`, `.avif`, `.heic`, `.heif`, `.bmp`, `.tiff`, `.tif`, `.jfif` 以及 `.gif`（提取高清首帧），并对损坏文件提供零崩溃跳过保护。
+PhotoWidget 针对这些问题做了底层优化，旨在提供一个**安静、流畅、不打扰且对硬件友好**的桌面照片挂件。
 
 ---
 
-## 🏗️ 架构设计 (Architecture)
+## 主要功能与技术实现
 
-```mermaid
-graph TD
-    subgraph StorageEngine [存储与扫描引擎]
-        Disk[300万+ 本地图片 (机械盘 / SSD)] -->|Win32 LARGE_FETCH DFS| Scanner[FastDirectoryEnumerator]
-        Scanner -->|批量事务写入| DB[(SQLite WAL + MMAP)]
-        DB -->|无分配轻量迭代| Snapshot[CompactIdSnapshot 内存快照]
-    end
+### 1. 海量图库秒级响应
+- **Win32 底层遍历**：采用 Windows 原生 `FindFirstFileExW` / `FindNextFileW`（开启 `FIND_FIRST_EX_LARGE_FETCH`），绕过 .NET 标准库的多次属性反射开销，直接读取物理目录流；
+- **SQLite 索引与紧凑快照**：扫描结果持久化存储于 SQLite（开启 WAL 模式与 MMAP 内存映射），运行时将数百万图片 ID 映射为紧凑内存结构，单次选图耗时小于 0.1ms；
+- **增量同步**：只在首次启动或文件夹有变动时做后台增量扫描，不影响前台操作。
 
-    subgraph PlaybackEngine [播放调度与预解码]
-        Snapshot --> Selector[RandomSelector 随机挑选器]
-        Selector --> Pipeline[2.5秒提前预解码管道]
-        Pipeline --> Skia[SkiaSharp EXIF纠偏与Cover缩放]
-        Power[Win+L / 熄屏感知] -->|100%切断IO| Pipeline
-    end
+### 2. 机械硬盘保护与预解码
+- **提前预热缓冲**：在设定轮播间隔到达前 2.5 秒，后台线程提前完成下一张图片的解码和尺寸缩放。轮播触发时直接从内存加载，实现 0 延迟瞬切；
+- **系统休眠与锁屏感知**：监听 Windows 会话消息（`Win + L` 锁屏）及电源广播（显示器息屏），自动切断所有磁盘 I/O 和轮播定时器，避免无人使用时的无谓读盘。
 
-    subgraph UIRendering [桌面渲染与交互]
-        Skia --> DoubleBuff[双层硬件加速 Image 缓冲区]
-        DoubleBuff -->|350ms CubicEase| CrossFade[平滑淡入淡出]
-        CrossFade --> Adaptive[AdaptivePalette 动态色彩采样]
-        History[PlaybackHistory 100步双向历史栈] <-->|滚轮/按钮穿梭| DoubleBuff
-    end
-```
+### 3. 视觉与动效细节
+- **双层平滑渐变**：基于 WPF 硬件加速的双图层交替渲染，每次切换伴随 350ms 淡入淡出过渡（Cross-Fade），消除生硬感；
+- **自适应配色**：根据当前展示图片的色彩与明度，自动调整悬浮控制栏的背景毛玻璃饱和度与图标明暗；
+- **EXIF 角度校正**：基于 SkiaSharp 解码，自动识别手机竖拍或相机旋转标记，确保画面方向正常；
+- **圆角与外观定制**：支持 0 ~ 100px 圆角调节（可切换无圆角直角风格），窗体支持任意边缘/四角自由缩放。
+
+### 4. 交互与历史记录
+- **双向历史穿梭**：内置 100 步历史栈，点击悬浮栏 `‹` 或向上滚轮可随时回退查看刚播过的照片；继续向下滚动会正向重播，到达末尾后才随机抽取新图；
+- **全屏与壁纸兼容**：通过 Win32 `SetWindowLongPtr` 将窗口安全挂载于桌面底层，自动兼容 Wallpaper Engine 等动态壁纸，不产生重绘闪烁；右键菜单支持在点击桌面任意区域时自动失焦收起。
+
+### 5. 常见图片格式全支持
+支持 `.jpg`, `.jpeg`, `.png`, `.webp`, `.avif`, `.heic`, `.heif`, `.bmp`, `.tiff`, `.jfif` 以及 `.gif`（提取高清静态首帧），遇到损坏文件自动跳过，保证播放不中断。
 
 ---
 
-## 🚀 快速开始与编译 (Getting Started)
+## 操作说明
 
-### 环境要求
-* Windows 10 (1809+) 或 Windows 11
-* [.NET 10.0 SDK](https://dotnet.microsoft.com/download/dotnet/10.0) 或更高版本
+| 方式 | 操作 | 功能说明 |
+| :--- | :--- | :--- |
+| **滚轮向下** | 鼠标悬停在组件上向下滚动 | 切换下一张图片 |
+| **滚轮向上** | 鼠标悬停在组件上向上滚动 | 回看上一张图片（历史记录） |
+| **鼠标拖拽** | 拖动窗口边缘或右下角手柄 | 自由调整组件尺寸 |
+| **悬浮控制条** | 鼠标移入底部区域 | 显示当前图片路径、一键打开原图、打开所在目录 |
+| **右键菜单** | 右击组件 | 打开偏好设置、暂停/继续轮播、新建组件 |
+| **托盘图标** | 右击右下角通知区域图标 | 开机自启动开关、管理所有组件、退出程序 |
 
-### 1. 克隆仓库
-```bash
+---
+
+## 编译与构建
+
+### 准备环境
+- Windows 10 (1809+) / Windows 11
+- [.NET 10.0 SDK](https://dotnet.microsoft.com/download/dotnet/10.0) 或更高版本
+
+### 常用命令
+```powershell
+# 1. 克隆代码
 git clone https://github.com/sakuyaxiaoye/PhotoWidget.git
 cd PhotoWidget
-```
 
-### 2. 运行单元测试
-项目自带 37 项覆盖核心目录扫描、SQLite 优化、内存防泄漏与历史穿梭的自动化测试套件：
-```bash
+# 2. 运行自动化测试（共 37 项单元与性能测试）
 dotnet test
-```
 
-### 3. 本地发布 (Release Build)
-```bash
+# 3. 编译并发布 Release 版本
 dotnet publish src/DesktopPicture.App/DesktopPicture.App.csproj -c Release -r win-x64 --self-contained false -o publish
 ```
-发布完成后，直接运行 `publish\PhotoWidget.exe` 即可使用！
+
+编译输出位于 `publish\` 目录，双击 `PhotoWidget.exe` 即可运行。
 
 ---
 
-## ⌨️ 常用交互手势 (Quick Controls)
+## 开源协议
 
-| 操作 | 动作 | 说明 |
-| :--- | :--- | :--- |
-| **滚轮向下** | 切换下一张 | 在组件上滑动滚轮向下切换 |
-| **滚轮向上** | 回看上一张 | 穿梭回退历史记录 |
-| **拖拽四角/边缘** | 自由缩放 | 实时自由调节组件尺寸（支持 4K 超清自适应） |
-| **右键组件** | 上下文菜单 | 打开设置、暂停轮播、打开原图或所在文件夹 |
-| **右键托盘图标** | 系统管理 | 一键开/关开机自启动、新建多组件、打开配置目录 |
-
----
-
-## 📄 开源许可证 (License)
-
-本项目采用 [MIT License](LICENSE) 许可证开源，欢迎提交 Issue 与 Pull Request！
+本项目基于 [MIT License](LICENSE) 协议开源。

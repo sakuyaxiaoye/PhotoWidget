@@ -66,6 +66,9 @@ public partial class App : Application
             WidgetController.Instance.Initialize();
 
             AppLogger.Instance.Info("Initialization completed successfully.");
+
+            // Flush startup working set back to OS after 3 seconds
+            System.Threading.Tasks.Task.Delay(3000).ContinueWith(_ => DesktopPicture.Diagnostics.MemoryOptimizer.TrimWorkingSet());
         }
         catch (Exception ex)
         {

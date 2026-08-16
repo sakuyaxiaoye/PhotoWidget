@@ -397,6 +397,8 @@ public sealed class WidgetScheduler : IDisposable
                 PredecodeNext();
             }, null, predecodeDelay, Timeout.Infinite);
         }
+
+        DesktopPicture.Diagnostics.MemoryOptimizer.OnImageSwitched();
     }
 
     public void ResetTimer()

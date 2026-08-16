@@ -56,8 +56,8 @@ public sealed class SqliteCatalogDatabase : IDisposable
                 PRAGMA foreign_keys = ON;
                 PRAGMA journal_mode = WAL;
                 PRAGMA synchronous = NORMAL;
-                PRAGMA mmap_size = 268435456;
-                PRAGMA cache_size = -64000;
+                PRAGMA mmap_size = 0;
+                PRAGMA cache_size = -2000;
                 PRAGMA temp_store = MEMORY;
             ";
             cmd.ExecuteNonQuery();
@@ -359,10 +359,10 @@ public sealed class SqliteCatalogDatabase : IDisposable
                 using var conn = CreateConnection();
                 using var cmd = conn.CreateCommand();
 
-                cmd.CommandText = "PRAGMA wal_checkpoint(TRUNCATE); PRAGMA optimize; PRAGMA incremental_vacuum;";
+                cmd.CommandText = "PRAGMA wal_checkpoint(TRUNCATE); PRAGMA optimize; PRAGMA incremental_vacuum; PRAGMA shrink_memory;";
                 cmd.ExecuteNonQuery();
 
-                AppLogger.Instance.Info("SqliteCatalogDatabase: Database maintenance complete (WAL truncated, indexes optimized).");
+                AppLogger.Instance.Info("SqliteCatalogDatabase: Database maintenance complete (WAL truncated, indexes optimized, memory released).");
             }
             catch (Exception ex)
             {

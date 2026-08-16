@@ -111,6 +111,9 @@ public sealed class ReconciliationEngine
                 sw.Stop();
                 AppLogger.Instance.Info($"ReconciliationEngine: Completed for Root {rootId}. Discovered {totalFound} images, active snapshot count: {snapshot.Count} in {sw.ElapsedMilliseconds} ms.");
 
+                // Reclaim all temporary crawl memory pages back to OS
+                DesktopPicture.Diagnostics.MemoryOptimizer.TrimWorkingSet();
+
                 return snapshot;
             }
             catch (OperationCanceledException)
